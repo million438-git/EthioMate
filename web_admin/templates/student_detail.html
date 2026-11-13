@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% block title %}Student profile · EthioMate Admin{% endblock %}
+{% block heading %}Student profile{% endblock %}
+
+{% block content %}
+<section class="page-intro profile-intro">
+    <div>
+        <h2>{{ profile.user.first_name or "Unnamed student" }}</h2>
+        <p>Student account details and recorded learning activity.</p>
+    </div>
+    <a class="back-link" href="/students">Back to students</a>
+</section>
+
+<section class="panel student-overview">
+    <div class="student-avatar">
+        {{ (profile.user.first_name or "S")[0]|upper }}
+    </div>
+    <div class="student-identity">
+        <h2>{{ profile.user.first_name or "Unnamed student" }}</h2>
+        <p>@{{ profile.user.username or "No Telegram username" }}</p>
+        <span class="status-pill">{{ profile.user.language|upper }}</span>
+    </div>
+    <div class="student-identifiers">
+        <span>TELEGRAM ID</span>
+        <strong>{{ profile.user.telegram_id }}</strong>
+    </div>
+</section>
+
+<section class="student-meta-grid">
+    <article class="panel">
+        <span class="system-label">REGISTERED</span>
+        <strong>{{ profile.user.created_at[:19].replace("T", " ") }}</strong>
+    </article>
+    <article class="panel">
+        <span class="system-label">LAST ACTIVE</span>
+        <strong>{{ profile.user.last_seen[:19].replace("T", " ") }}</strong>
+    </article>
+    <article class="panel">
+        <span class="system-label">PREFERRED LANGUAGE</span>
+        <strong>{{ profile.user.language|upper }}</strong>
+    </article>
+</section>
+
+<section class="stats-grid student-stats">
+    <article class="stat-card">
+        <div class="stat-top">Quiz attempts</div>
+        <strong>{{ profile.quiz_stats.attempts }}</strong>
+        <small>Recorded completed quizzes</small>
+    </article>
+    <article class="stat-card">
+        <div class="stat-top">Average score</div>
+        <strong>{{ profile.quiz_stats.average_score }}%</strong>
+        <small>Average of recorded quiz scores</small>
+    </article>
+    <article class="stat-card">
+        <div class="stat-top">Questions answered</div>
+        <strong>{{ profile.quiz_stats.questions_answered }}</strong>
+        <small>Questions across completed quizzes</small>
+    </article>
+    <article class="stat-card">
+        <div class="stat-top">Correct answers</div>
+        <strong>{{ profile.quiz_stats.correct_answers }}</strong>
+        <small>Total recorded correct answers</small>
+    </article>
+</section>
+
+<section class="panel table-panel profile-table">
+    <div class="panel-heading">
+        <div>
+            <h3>Quiz history</h3>
+            <p>Most recent 20 completed quiz attempts</p>
+        </div>
+        <span class="count-pill">{{ profile.quizzes|length }} records</span>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Topic</th>
+                    <th>Difficulty</th>
+                    <th>Score</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for quiz in profile.quizzes %}
+                <tr>
+                    <td>{{ quiz.subject }}</td>
+                    <td>{{ quiz.topic }}</td>
+                    <td>{{ quiz.difficulty }}</td>
+                    <td>
+                        <strong>{{ quiz.correct_answers }}/{{ quiz.total_questions }}</strong>
+                        <small class="cell-sub">{{ quiz.score_percent }}%</small>
+                    </td>
+                    <td>{{ quiz.created_at[:19].replace("T", " ") }}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="5" class="empty-state">No quiz history recorded.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="profile-feedback">
+    <div class="panel-heading">
+        <div>
+            <h3>Feedback and reports</h3>
+            <p>Submissions made by this student</p>
+        </div>
+        <span class="count-pill">{{ profile.feedback_count }} total submissions</span>
+    </div>
+
+    {% for item in profile.feedback %}
+    <article class="panel feedback-card">
+        <div class="feedback-header">
+            <div>
+                <span class="type-label">{{ item.submission_type|upper }}</span>
+                <h3>Submission #{{ item.id }}</h3>
+            </div>
+            <span class="status-pill {{ item.status }}">{{ item.status|title }}</span>
+        </div>
+        <p class="feedback-content">{{ item.content }}</p>
+        <small class="cell-sub">Submitted {{ item.created_at[:19].replace("T", " ") }}</small>
+    </article>
+    {% else %}
+    <div class="panel empty-state">No feedback or reports from this student.</div>
+    {% endfor %}
+</section>
+{% endblock %}

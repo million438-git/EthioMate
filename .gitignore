@@ -1,0 +1,31 @@
+.env
+venv/
+__pycache__/
+*.pyc
+*.db
+.pytest_cache/
+*.sqlite3
+
+# Environment variables and secrets
+.env*
+
+# Python environments and caches
+.venv/
+*.py[cod]
+.mypy_cache/
+.ruff_cache/
+
+# Local databases and backups
+*.sqlite
+database/*.db
+database/*.sqlite
+database/*.sqlite3
+backups/
+*.bak
+*.bak.*
+
+# Build and test artifacts
+.coverage
+htmlcov/
+dist/
+build/

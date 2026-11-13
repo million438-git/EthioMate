@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block title %}{% if course %}Edit course{% else %}Create course{% endif %} · EthioMate Admin{% endblock %}
+{% block heading %}{% if course %}Edit course{% else %}Create course{% endif %}{% endblock %}
+
+{% block content %}
+<section class="page-intro academy-intro">
+    <div>
+        <h2>{% if course %}Course details{% else %}New Academy course{% endif %}</h2>
+        <p>Set up the course information and its English, Amharic and Afaan Oromo content.</p>
+    </div>
+    {% if course %}
+        <a class="secondary-button" href="/academy/courses/{{ course.id }}/curriculum">Manage curriculum</a>
+        {% endif %}
+        <a class="secondary-button" href="/academy">Back to Academy</a>
+</section>
+
+{% if error %}
+<div class="academy-alert error-alert">{{ error }}</div>
+{% endif %}
+{% if success %}
+<div class="academy-alert success-alert">{{ success }}</div>
+{% endif %}
+
+{% if not categories %}
+<div class="academy-alert error-alert">
+    No active categories are available. Create a category before creating a course.
+    <a href="/academy/categories">Manage categories →</a>
+</div>
+{% else %}
+
+<form method="post"
+      action="{% if course %}/academy/courses/{{ course.id }}/edit{% else %}/academy/courses{% endif %}"
+      class="academy-form course-editor">
+
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+
+    <section class="panel form-section">
+        <div class="panel-heading">
+            <div><h3>Course settings</h3><p>Basic organization and learning level.</p></div>
+            {% if course %}
+            <span class="academy-status {{ course.status }}">{{ course.status|title }}</span>
+            {% else %}
+            <span class="academy-status draft">Draft</span>
+            {% endif %}
+        </div>
+
+        <div class="form-grid">
+            <div class="form-field">
+                <label for="course-category">Category</label>
+                <select id="course-category" name="category_id" required>
+                    {% for category in categories %}
+                    <option value="{{ category.id }}"
+                        {% if course and course.category_id == category.id %}selected{% endif %}>
+                        {{ category.name_en }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-field">
+                <label for="course-slug">Course slug</label>
+                <input id="course-slug" name="slug" required maxlength="100"
+                       pattern="[a-z0-9]+(-[a-z0-9]+)*"
+                       value="{{ course.slug if course else '' }}"
+                       placeholder="python-programming">
+                <small>Lowercase letters, numbers and single hyphens.</small>
+            </div>
+
+            <div class="form-field">
+                <label for="course-level">Difficulty level</label>
+                <select id="course-level" name="level" required>
+                    {% for level in ['beginner', 'intermediate', 'advanced'] %}
+                    <option value="{{ level }}"
+                        {% if course and course.level == level %}selected{% elif not course and level == 'beginner' %}selected{% endif %}>
+                        {{ level|title }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-field">
+                <label for="course-sort">Display order</label>
+                <input id="course-sort" type="number" name="sort_order" min="0"
+                       value="{{ course.sort_order if course else 0 }}">
+            </div>
+        </div>
+    </section>
+
+    <section class="panel form-section">
+        <div class="panel-heading">
+            <div><h3>Course content and translations</h3><p>English title is required. Other language translations are optional.</p></div>
+        </div>
+
+        {% set translations = course.translations if course else {} %}
+
+        <div class="language-fields">
+            <section class="language-section">
+                <h4>English <span class="required-label">Required</span></h4>
+                <label for="title-en">Course title</label>
+                <input id="title-en" name="title_en" required maxlength="180"
+                       value="{{ translations.get('en', {}).get('title', '') }}">
+                <label for="description-en">Description</label>
+                <textarea id="description-en" name="description_en" maxlength="5000" rows="5">{{ translations.get('en', {}).get('description', '') }}</textarea>
+            </section>
+
+            <section class="language-section">
+                <h4>Amharic <span class="optional-label">Optional</span></h4>
+                <label for="title-am">የኮርስ ርዕስ</label>
+                <input id="title-am" name="title_am" maxlength="180"
+                       value="{{ translations.get('am', {}).get('title', '') }}">
+                <label for="description-am">መግለጫ</label>
+                <textarea id="description-am" name="description_am" maxlength="5000" rows="5">{{ translations.get('am', {}).get('description', '') }}</textarea>
+            </section>
+
+            <section class="language-section">
+                <h4>Afaan Oromo <span class="optional-label">Optional</span></h4>
+                <label for="title-om">Mata-duree koorsii</label>
+                <input id="title-om" name="title_om" maxlength="180"
+                       value="{{ translations.get('om', {}).get('title', '') }}">
+                <label for="description-om">Ibsa</label>
+                <textarea id="description-om" name="description_om" maxlength="5000" rows="5">{{ translations.get('om', {}).get('description', '') }}</textarea>
+            </section>
+        </div>
+    </section>
+
+    <div class="form-actions">
+        <a class="secondary-button" href="/academy">Cancel</a>
+        <button class="primary-button" type="submit">
+            {% if course %}Save course details{% else %}Create draft course{% endif %}
+        </button>
+    </div>
+</form>
+{% endif %}
+{% endblock %}

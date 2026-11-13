@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101d35">
+    <title>{% block title %}EthioMate Admin{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/admin.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar">
+        <a class="brand" href="/">
+            <span class="brand-mark">E</span>
+            <span>
+                <strong>EthioMate</strong>
+                <small>Administration</small>
+            </span>
+        </a>
+
+        <div class="nav-label">WORKSPACE</div>
+        <nav class="navigation">
+            <a class="{% if active == 'overview' %}active{% endif %}" href="/">
+                <span>▦</span> Overview
+            </a>
+            <a class="{% if active == 'students' %}active{% endif %}" href="/students">
+                <span>♙</span> Students
+            </a>
+            <a class="{% if active == 'feedback' %}active{% endif %}" href="/feedback">
+                <span>▤</span> Feedback
+            </a>
+            <a class="{% if active == 'quizzes' %}active{% endif %}" href="/quizzes">
+                <span>▣</span> Quiz activity
+            </a>
+            <a class="{% if active == 'academy' %}active{% endif %}" href="/academy">
+                <span>▧</span> Learning Academy
+            </a>
+            <a class="{% if active == 'system' %}active{% endif %}" href="/system">
+                <span>⚙</span> System health
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <div class="admin-identity">
+                <span class="avatar">A</span>
+                <span><strong>Administrator</strong><small>Authorized access</small></span>
+            </div>
+            <form method="post" action="/logout">
+                <input type="hidden" name="csrf" value="{{ csrf }}">
+                <button class="logout-button" type="submit">Sign out</button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div>
+                <span class="eyebrow">ETHIOMATE / ADMINISTRATION</span>
+                <h1>{% block heading %}Overview{% endblock %}</h1>
+            </div>
+            <div class="topbar-status"><span></span> Admin session active</div>
+        </header>
+
+        {% block content %}{% endblock %}
+
+        <footer class="footer">
+            EthioMate Administration · Secure management workspace
+        </footer>
+    </main>
+</div>
+</body>
+</html>

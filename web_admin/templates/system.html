@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}System health · EthioMate Admin{% endblock %}
+{% block heading %}System health{% endblock %}
+{% block content %}
+<section class="page-intro"><h2>Service configuration</h2><p>Basic checks of the local database and configured integrations. No secret values are displayed.</p></section>
+<section class="system-grid">
+    <article class="panel system-card">
+        <span class="system-label">DATABASE INTEGRITY</span>
+        <strong class="{% if status.database_integrity == 'ok' %}healthy{% else %}unhealthy{% endif %}">{{ status.database_integrity|upper }}</strong>
+        <p>SQLite integrity check</p>
+    </article>
+    <article class="panel system-card">
+        <span class="system-label">DATABASE JOURNAL</span>
+        <strong>{{ status.database_journal_mode|upper }}</strong>
+        <p>SQLite journal mode</p>
+    </article>
+    <article class="panel system-card">
+        <span class="system-label">TELEGRAM BOT</span>
+        <strong class="{% if status.telegram_configured %}healthy{% else %}unhealthy{% endif %}">{{ "Configured" if status.telegram_configured else "Not configured" }}</strong>
+        <p>Configuration presence only; this does not test connectivity.</p>
+    </article>
+    <article class="panel system-card">
+        <span class="system-label">GEMINI AI</span>
+        <strong class="{% if status.gemini_configured %}healthy{% else %}unhealthy{% endif %}">{{ "Configured" if status.gemini_configured else "Not configured" }}</strong>
+        <p>API key presence only; this does not test live requests.</p>
+    </article>
+</section>
+<div class="notice">This page reports configuration and database checks. Live service monitoring, error tracking and alerts will be added in a later phase.</div>
+{% endblock %}

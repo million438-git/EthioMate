@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Academy Categories · EthioMate Admin{% endblock %}
+{% block heading %}Academy categories{% endblock %}
+
+{% block content %}
+<section class="page-intro academy-intro">
+    <div>
+        <h2>Course categories</h2>
+        <p>Organize learning content into clear subject and professional skill areas.</p>
+    </div>
+    <a class="secondary-button" href="/academy">Back to Academy</a>
+</section>
+
+{% if error %}
+<div class="academy-alert error-alert">{{ error }}</div>
+{% endif %}
+{% if success %}
+<div class="academy-alert success-alert">{{ success }}</div>
+{% endif %}
+
+<section class="academy-category-layout">
+    <article class="panel">
+        <div class="panel-heading">
+            <div><h3>Create a category</h3><p>Category names are required in all three supported languages.</p></div>
+        </div>
+
+        <form method="post" action="/academy/categories" class="academy-form">
+            <input type="hidden" name="csrf" value="{{ csrf }}">
+
+            <label for="category-slug">Category slug</label>
+            <input id="category-slug" name="slug" required maxlength="100"
+                   pattern="[a-z0-9]+(-[a-z0-9]+)*"
+                   placeholder="technology">
+
+            <div class="language-fields">
+                <section class="language-section">
+                    <h4>English</h4>
+                    <label for="category-name-en">Category name</label>
+                    <input id="category-name-en" name="name_en" required maxlength="120">
+                    <label for="category-description-en">Description</label>
+                    <textarea id="category-description-en" name="description_en" maxlength="1000" rows="3"></textarea>
+                </section>
+
+                <section class="language-section">
+                    <h4>Amharic</h4>
+                    <label for="category-name-am">የምድብ ስም</label>
+                    <input id="category-name-am" name="name_am" required maxlength="120">
+                    <label for="category-description-am">መግለጫ</label>
+                    <textarea id="category-description-am" name="description_am" maxlength="1000" rows="3"></textarea>
+                </section>
+
+                <section class="language-section">
+                    <h4>Afaan Oromo</h4>
+                    <label for="category-name-om">Maqaa ramaddii</label>
+                    <input id="category-name-om" name="name_om" required maxlength="120">
+                    <label for="category-description-om">Ibsa</label>
+                    <textarea id="category-description-om" name="description_om" maxlength="1000" rows="3"></textarea>
+                </section>
+            </div>
+
+            <button class="primary-button" type="submit">Create category</button>
+        </form>
+    </article>
+
+    <article class="panel">
+        <div class="panel-heading">
+            <div><h3>Existing categories</h3><p>Current categories and their course counts.</p></div>
+            <span class="count-pill">{{ categories|length }} total</span>
+        </div>
+
+        <div class="category-list">
+            {% for category in categories %}
+            <div class="category-item">
+                <div>
+                    <strong>{{ category.name_en }}</strong>
+                    <span class="cell-sub">{{ category.slug }}</span>
+                    <span class="category-translations">{{ category.name_am }} · {{ category.name_om }}</span>
+                </div>
+                <div class="category-meta">
+                    <strong>{{ category.course_count }}</strong>
+                    <span>courses</span>
+                    <span class="academy-status {% if category.is_active %}published{% else %}archived{% endif %}">
+                        {% if category.is_active %}Active{% else %}Inactive{% endif %}
+                    </span>
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-state">No categories have been created yet.</div>
+            {% endfor %}
+        </div>
+    </article>
+</section>
+{% endblock %}

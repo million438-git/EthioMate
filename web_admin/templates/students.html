@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Students · EthioMate Admin{% endblock %}
+{% block heading %}Student management{% endblock %}
+{% block content %}
+<section class="page-intro"><h2>Registered students</h2><p>Search student accounts and inspect their registration and recent activity.</p></section>
+<form class="search-form" method="get" action="/students">
+    <input name="q" value="{{ search }}" placeholder="Search name, username or Telegram ID">
+    <button class="primary-button" type="submit">Search</button>
+    {% if search %}<a class="clear-link" href="/students">Clear</a>{% endif %}
+</form>
+<section class="panel table-panel">
+    <div class="panel-heading"><div><h3>Student accounts</h3><p>Showing up to 100 matching accounts</p></div><span class="count-pill">{{ users|length }} results</span></div>
+    <div class="table-wrap">
+    <table>
+        <thead><tr><th>Student</th><th>Telegram ID</th><th>Language</th><th>Registered</th><th>Last active</th></tr></thead>
+        <tbody>
+        {% for user in users %}
+        <tr>
+            <td>
+                <a class="student-link" href="/students/{{ user.telegram_id }}">
+                    <strong>{{ user.first_name or "Unnamed user" }}</strong>
+                    <small class="cell-sub">@{{ user.username or "no username" }}</small>
+                </a>
+            </td>
+            <td>{{ user.telegram_id }}</td>
+            <td><span class="status-pill">{{ user.language|upper }}</span></td>
+            <td>{{ user.created_at[:10] }}</td>
+            <td>{{ user.last_seen[:19].replace("T", " ") }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="empty-state">No matching students found.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</section>
+{% endblock %}

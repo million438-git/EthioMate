@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}Course curriculum · EthioMate Admin{% endblock %}
+{% block heading %}Course curriculum{% endblock %}
+
+{% block content %}
+<section class="page-intro academy-intro">
+    <div>
+        <h2>{{ course.translations.get('en', {}).get('title', course.slug) }}</h2>
+        <p>Manage modules, lesson content, learning activities and publication.</p>
+    </div>
+    <div class="academy-actions">
+        <a class="secondary-button" href="/academy/courses/{{ course.id }}/edit">Course details</a>
+        <a class="secondary-button" href="/academy">All courses</a>
+    </div>
+</section>
+
+{% if error %}<div class="academy-alert error-alert">{{ error }}</div>{% endif %}
+{% if success %}<div class="academy-alert success-alert">{{ success }}</div>{% endif %}
+
+<section class="panel form-section">
+    <div class="panel-heading">
+        <div>
+            <h3>Course modules</h3>
+            <p>{{ modules|length }} module(s). Draft modules and lessons are visible only to administrators.</p>
+        </div>
+    </div>
+
+    {% if modules %}
+        {% for module in modules %}
+        <article class="curriculum-module">
+            <div class="curriculum-module-heading">
+                <div>
+                    <h3>{{ module.title }}</h3>
+                    <p>{{ module.slug }} · {{ module.lessons|length }} lesson(s)</p>
+                </div>
+                <span class="academy-status {{ 'published' if module.is_published else 'draft' }}">
+                    {{ 'Published' if module.is_published else 'Draft' }}
+                </span>
+            </div>
+
+            <form method="post" action="/academy/modules/{{ module.id }}/edit" class="academy-form">
+                <input type="hidden" name="csrf" value="{{ csrf }}">
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label>Module slug</label>
+                        <input name="slug" required maxlength="100" value="{{ module.slug }}">
+                    </div>
+                    <div class="form-field">
+                        <label>Display order</label>
+                        <input type="number" name="sort_order" min="0" required value="{{ module.sort_order }}">
+                    </div>
+                    {% for language, label in [('en', 'English'), ('am', 'Amharic'), ('om', 'Afaan Oromo')] %}
+                    <div class="form-field">
+                        <label>{{ label }} title{% if language == 'en' %} (required){% endif %}</label>
+                        <input name="title_{{ language }}" maxlength="180"
+                               {% if language == 'en' %}required{% endif %}
+                               value="{{ module.translations.get(language, {}).get('title', '') }}">
+                    </div>
+                    {% endfor %}
+                </div>
+                {% for language, label in [('en', 'English'), ('am', 'Amharic'), ('om', 'Afaan Oromo')] %}
+                <div class="form-field">
+                    <label>{{ label }} description</label>
+                    <textarea name="description_{{ language }}" rows="2" maxlength="5000">{{ module.translations.get(language, {}).get('description', '') }}</textarea>
+                </div>
+                {% endfor %}
+                <div class="form-actions">
+                    <button class="primary-button" type="submit">Save module</button>
+                </div>
+            </form>
+
+            <div class="curriculum-lessons">
+                <div class="panel-heading">
+                    <div><h4>Lessons</h4></div>
+                    <a class="small-button" href="/academy/lessons/new?module_id={{ module.id }}">Add lesson</a>
+                </div>
+                {% if module.lessons %}
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Lesson</th><th>Type</th><th>Duration</th><th>Status</th><th></th></tr></thead>
+                        <tbody>
+                        {% for lesson in module.lessons %}
+                        <tr>
+                            <td>
+                                <strong>{{ lesson.title }}</strong>
+                                <small class="table-subtext">{{ lesson.slug }}</small>
+                            </td>
+                            <td>{{ lesson.lesson_type|title }}</td>
+                            <td>{{ lesson.estimated_minutes }} min</td>
+                            <td>
+                                <span class="academy-status {{ 'published' if lesson.is_published else 'draft' }}">
+                                    {{ 'Published' if lesson.is_published else 'Draft' }}
+                                </span>
+                            </td>
+                            <td><a class="small-button" href="/academy/lessons/{{ lesson.id }}/edit">Edit</a></td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="empty-state">No lessons have been added to this module yet.</p>
+                {% endif %}
+            </div>
+
+            <form method="post" action="/academy/modules/{{ module.id }}/status" class="inline-status-form">
+                <input type="hidden" name="csrf" value="{{ csrf }}">
+                {% if module.is_published %}
+                    <input type="hidden" name="is_published" value="0">
+                    <button class="secondary-button" type="submit">Unpublish module</button>
+                {% else %}
+                    <input type="hidden" name="is_published" value="1">
+                    <button class="secondary-button" type="submit">Publish module</button>
+                {% endif %}
+            </form>
+        </article>
+        {% endfor %}
+    {% else %}
+        <p class="empty-state">This course has no modules yet. Create the first module below.</p>
+    {% endif %}
+</section>
+
+<section class="panel form-section">
+    <div class="panel-heading">
+        <div><h3>Add a module</h3><p>New modules are saved as drafts.</p></div>
+    </div>
+    <form method="post" action="/academy/courses/{{ course.id }}/modules" class="academy-form">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <div class="form-grid">
+            <div class="form-field">
+                <label>Module slug</label>
+                <input name="slug" required maxlength="100" placeholder="python-fundamentals">
+            </div>
+            <div class="form-field">
+                <label>Display order</label>
+                <input type="number" name="sort_order" min="0" value="{{ modules|length + 1 }}">
+            </div>
+        </div>
+        {% for language, label in [('en', 'English'), ('am', 'Amharic'), ('om', 'Afaan Oromo')] %}
+        <section class="language-section">
+            <h4>{{ label }}{% if language == 'en' %} · Required{% else %} · Optional{% endif %}</h4>
+            <label>Module title</label>
+            <input name="title_{{ language }}" maxlength="180" {% if language == 'en' %}required{% endif %}>
+            <label>Description</label>
+            <textarea name="description_{{ language }}" rows="2" maxlength="5000"></textarea>
+        </section>
+        {% endfor %}
+        <div class="form-actions">
+            <button class="primary-button" type="submit">Create draft module</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Feedback · EthioMate Admin{% endblock %}
+{% block heading %}Feedback center{% endblock %}
+{% block content %}
+<section class="page-intro"><h2>Student submissions</h2><p>Review feedback, bug reports, suggestions and feature requests.</p></section>
+<div class="filter-tabs">
+    <a class="{% if selected_status == 'pending' %}selected{% endif %}" href="/feedback?status=pending">Pending</a>
+    <a class="{% if selected_status == 'reviewed' %}selected{% endif %}" href="/feedback?status=reviewed">Reviewed</a>
+    <a class="{% if selected_status == 'all' %}selected{% endif %}" href="/feedback?status=all">All submissions</a>
+</div>
+<section class="feedback-list">
+{% for item in submissions %}
+<article class="panel feedback-card">
+    <div class="feedback-header">
+        <div><span class="type-label">{{ item.submission_type|replace("_", " ")|upper }}</span><h3>#{{ item.id }} · {{ item.first_name or "Student" }}</h3><small>@{{ item.username or "no username" }} · ID {{ item.telegram_id }}</small></div>
+        <span class="status-pill {{ item.status }}">{{ item.status|title }}</span>
+    </div>
+    <p class="feedback-content">{{ item.content }}</p>
+    <div class="feedback-footer"><span>Submitted {{ item.created_at[:19].replace("T", " ") }}</span>
+    {% if item.status == "pending" %}
+    <form method="post" action="/feedback/{{ item.id }}/review">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <button class="small-button" type="submit">Mark reviewed</button>
+    </form>
+    {% else %}
+    <span>Reviewed {{ (item.reviewed_at or "")[:19].replace("T", " ") }}</span>
+    {% endif %}
+    </div>
+</article>
+{% else %}
+<div class="panel empty-state">No submissions in this view.</div>
+{% endfor %}
+</section>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Overview · EthioMate Admin{% endblock %}
+{% block heading %}Overview{% endblock %}
+{% block content %}
+<section class="welcome-row">
+    <div>
+        <h2>System overview</h2>
+        <p>Live information from your EthioMate database.</p>
+    </div>
+    <span class="live-label"><span></span> LIVE DATABASE</span>
+</section>
+
+<section class="stats-grid">
+    <article class="stat-card">
+        <div class="stat-top"><span>Total students</span><span class="stat-icon blue">♙</span></div>
+        <strong>{{ stats.total_users }}</strong>
+        <small>{{ stats.new_users_today }} registered today</small>
+    </article>
+    <article class="stat-card">
+        <div class="stat-top"><span>Active this week</span><span class="stat-icon green">↗</span></div>
+        <strong>{{ stats.active_users_week }}</strong>
+        <small>Users seen in the last 7 days</small>
+    </article>
+    <article class="stat-card">
+        <div class="stat-top"><span>Quiz attempts</span><span class="stat-icon purple">▣</span></div>
+        <strong>{{ stats.quiz_attempts }}</strong>
+        <small>{{ stats.questions_answered }} questions answered</small>
+    </article>
+    <article class="stat-card">
+        <div class="stat-top"><span>Average quiz score</span><span class="stat-icon amber">％</span></div>
+        <strong>{{ stats.average_score }}%</strong>
+        <small>{{ stats.correct_answers }} correct answers recorded</small>
+    </article>
+    <article class="stat-card">
+        <div class="stat-top"><span>Pending feedback</span><span class="stat-icon red">▤</span></div>
+        <strong>{{ stats.pending_feedback }}</strong>
+        <small>{{ stats.feedback_total }} total submissions</small>
+        <a class="card-link" href="/feedback">Open feedback inbox →</a>
+    </article>
+</section>
+
+<section class="content-grid">
+    <article class="panel">
+        <div class="panel-heading">
+            <div><h3>Learning activity</h3><p>Recorded quiz performance</p></div>
+            <a href="/quizzes">View activity →</a>
+        </div>
+        <div class="performance">
+            <div class="performance-value">{{ stats.average_score }}%</div>
+            <div class="performance-track">
+                <div class="performance-fill" style="width: {{ [stats.average_score, 100]|min }}%"></div>
+            </div>
+            <p>Average score across all recorded quiz attempts.</p>
+        </div>
+        <div class="mini-metrics">
+            <div><strong>{{ stats.questions_answered }}</strong><span>Questions answered</span></div>
+            <div><strong>{{ stats.correct_answers }}</strong><span>Correct answers</span></div>
+        </div>
+    </article>
+
+    <article class="panel">
+        <div class="panel-heading"><div><h3>Administration</h3><p>Management shortcuts</p></div></div>
+        <div class="quick-links">
+            <a href="/students"><span class="quick-icon">♙</span><span><strong>Manage students</strong><small>Search registered accounts</small></span><b>→</b></a>
+            <a href="/feedback"><span class="quick-icon">▤</span><span><strong>Review feedback</strong><small>Read student submissions</small></span><b>→</b></a>
+            <a href="/quizzes"><span class="quick-icon">▣</span><span><strong>Quiz activity</strong><small>Inspect recorded results</small></span><b>→</b></a>
+            <a href="/system"><span class="quick-icon">⚙</span><span><strong>System health</strong><small>Check database and services</small></span><b>→</b></a>
+        </div>
+    </article>
+</section>
+{% endblock %}

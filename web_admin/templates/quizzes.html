@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Quiz activity · EthioMate Admin{% endblock %}
+{% block heading %}Quiz activity{% endblock %}
+{% block content %}
+<section class="page-intro"><h2>Student quiz results</h2><p>Recent completed quizzes recorded in the existing database.</p></section>
+<section class="panel table-panel">
+    <div class="panel-heading"><div><h3>Recent attempts</h3><p>Latest 50 recorded results</p></div><span class="count-pill">{{ quizzes|length }} records</span></div>
+    <div class="table-wrap">
+    <table>
+        <thead><tr><th>Student</th><th>Subject</th><th>Topic</th><th>Difficulty</th><th>Score</th><th>Date</th></tr></thead>
+        <tbody>
+        {% for quiz in quizzes %}
+        <tr>
+            <td><strong>{{ quiz.first_name or "Student" }}</strong><small class="cell-sub">{{ quiz.telegram_id }}</small></td>
+            <td>{{ quiz.subject }}</td><td>{{ quiz.topic }}</td><td>{{ quiz.difficulty }}</td>
+            <td><strong>{{ quiz.correct_answers }}/{{ quiz.total_questions }}</strong><small class="cell-sub">{{ quiz.score_percent }}%</small></td>
+            <td>{{ quiz.created_at[:19].replace("T", " ") }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="empty-state">No quiz attempts have been recorded.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}Academy · EthioMate Admin{% endblock %}
+{% block heading %}Academy management{% endblock %}
+
+{% block content %}
+<section class="page-intro academy-intro">
+    <div>
+        <h2>Learning Academy</h2>
+        <p>Create and manage courses, organize learning content and monitor enrollment.</p>
+    </div>
+    <div class="academy-actions">
+        <a class="secondary-button" href="/academy/categories">Manage categories</a>
+        <a class="primary-button" href="/academy/courses/new">Create course</a>
+    </div>
+</section>
+
+{% if error %}
+<div class="academy-alert error-alert">{{ error }}</div>
+{% endif %}
+{% if success %}
+<div class="academy-alert success-alert">{{ success }}</div>
+{% endif %}
+
+<section class="stats-grid academy-stats">
+    <article class="stat-card">
+        <div class="stat-top"><span>Total courses</span><span class="stat-icon blue">▣</span></div>
+        <strong>{{ overview.total_courses }}</strong>
+        <small>All courses in the Academy</small>
+    </article>
+    <article class="stat-card">
+        <div class="stat-top"><span>Published</span><span class="stat-icon green">✓</span></div>
+        <strong>{{ overview.published_courses }}</strong>
+        <small>Available for students</small>
+    </article>
+    <article class="stat-card">
+        <div class="stat-top"><span>Drafts</span><span class="stat-icon amber">✎</span></div>
+        <strong>{{ overview.draft_courses }}</strong>
+        <small>Not yet published</small>
+    </article>
+    <article class="stat-card">
+        <div class="stat-top"><span>Enrollments</span><span class="stat-icon purple">♙</span></div>
+        <strong>{{ overview.total_enrollments }}</strong>
+        <small>{{ overview.completed_enrollments }} completed</small>
+    </article>
+    <article class="stat-card">
+        <div class="stat-top"><span>Pending submissions</span><span class="stat-icon red">▤</span></div>
+        <strong>{{ overview.pending_submissions }}</strong>
+        <small>{{ overview.total_submissions }} total submissions</small>
+    </article>
+</section>
+
+<section class="panel academy-summary">
+    <div class="academy-summary-item">
+        <span>Active categories</span>
+        <strong>{{ overview.active_categories }}</strong>
+    </div>
+    <div class="academy-summary-item">
+        <span>Archived courses</span>
+        <strong>{{ overview.archived_courses }}</strong>
+    </div>
+    <div class="academy-summary-item">
+        <span>Completed enrollments</span>
+        <strong>{{ overview.completed_enrollments }}</strong>
+    </div>
+</section>
+
+<section class="panel table-panel academy-course-panel">
+    <div class="panel-heading academy-table-heading">
+        <div>
+            <h3>Course catalog</h3>
+            <p>Manage course details and publication status</p>
+        </div>
+        <span class="count-pill">{{ courses|length }} courses</span>
+    </div>
+
+    <nav class="filter-tabs academy-filters">
+        <a href="/academy" class="{% if not selected_status %}selected{% endif %}">All</a>
+        <a href="/academy?status=published" class="{% if selected_status == 'published' %}selected{% endif %}">Published</a>
+        <a href="/academy?status=draft" class="{% if selected_status == 'draft' %}selected{% endif %}">Drafts</a>
+        <a href="/academy?status=archived" class="{% if selected_status == 'archived' %}selected{% endif %}">Archived</a>
+    </nav>
+
+    <div class="table-wrap">
+        <table class="academy-table">
+            <thead>
+                <tr>
+                    <th>Course</th>
+                    <th>Category</th>
+                    <th>Level</th>
+                    <th>Modules</th>
+                    <th>Enrollments</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for course in courses %}
+                <tr>
+                    <td>
+                        <strong>{{ course.title }}</strong>
+                        <span class="cell-sub">{{ course.slug }}</span>
+                    </td>
+                    <td>{{ course.category_name }}</td>
+                    <td><span class="level-label">{{ course.level|title }}</span></td>
+                    <td>{{ course.module_count }}</td>
+                    <td>{{ course.enrollment_count }}</td>
+                    <td>
+                        <span class="academy-status {{ course.status }}">
+                            {{ course.status|title }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="course-row-actions">
+                            <a class="small-button" href="/academy/courses/{{ course.id }}/edit">Edit</a>
+                            <form method="post" action="/academy/courses/{{ course.id }}/status">
+                                <input type="hidden" name="csrf" value="{{ csrf }}">
+                                <select name="status" aria-label="Change course status">
+                                    <option value="draft" {% if course.status == 'draft' %}selected{% endif %}>Draft</option>
+                                    <option value="published" {% if course.status == 'published' %}selected{% endif %}>Published</option>
+                                    <option value="archived" {% if course.status == 'archived' %}selected{% endif %}>Archived</option>
+                                </select>
+                                <button class="small-button" type="submit">Save</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="7" class="empty-state">
+                        <strong>No courses found</strong>
+                        <span class="cell-sub">Create a course to begin building your Academy catalog.</span>
+                        <a class="card-link" href="/academy/courses/new">Create your first course →</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

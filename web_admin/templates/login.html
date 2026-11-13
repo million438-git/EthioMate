@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101d35">
+    <title>Administrator Login · EthioMate</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/admin.css') }}">
+</head>
+<body class="login-page">
+    <main class="login-card">
+        <div class="login-brand">
+            <span class="brand-mark">E</span>
+            <div><strong>EthioMate</strong><small>ADMINISTRATION PORTAL</small></div>
+        </div>
+
+        <div class="login-intro">
+            <span class="eyebrow">SECURE ACCESS</span>
+            <h1>Welcome back</h1>
+            <p>Sign in with your administrator credentials to manage EthioMate.</p>
+        </div>
+
+        {% if error %}
+        <div class="alert error">{{ error }}</div>
+        {% endif %}
+
+        <form method="post" action="/login" class="login-form">
+            <input type="hidden" name="csrf" value="{{ csrf }}">
+            <label for="username">Administrator username</label>
+            <input id="username" name="username" autocomplete="username"
+                   required maxlength="64" autofocus>
+            <label for="password">Password</label>
+            <input id="password" name="password" type="password"
+                   autocomplete="current-password" required>
+            <button class="primary-button" type="submit">Sign in securely</button>
+        </form>
+
+        <p class="login-note">Authorized administrators only. Your session expires after 8 hours.</p>
+    </main>
+</body>
+</html>
